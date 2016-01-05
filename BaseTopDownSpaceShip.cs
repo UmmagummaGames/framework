@@ -13,7 +13,7 @@ public class BaseTopDownSpaceShip : ExtendedCustomMonoBehavior {
 	public float moveZSpeed = 15f;
 
 	public float limitX = 15f;
-	public float limtZ = 15f;
+	public float limitZ = 15f;
 
 	private float originZ;
 
@@ -87,6 +87,12 @@ public class BaseTopDownSpaceShip : ExtendedCustomMonoBehavior {
 		}
 
 		//tambien revisamos la posicion z
+		if(myTransform.localPosition.z <= originZ || myTransform.localPosition.z >= limitZ)
+		{
+			thePos = Mathf.Clamp(myTransform.localPosition.z,originZ,limitZ);
+			myTransform.localPosition = new Vector3(myTransform.localPosition.x,myTransform.localPosition.y,thePos);
+
+		}
 
 	}
 }
