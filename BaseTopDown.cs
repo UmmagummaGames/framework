@@ -120,4 +120,58 @@ public class BaseTopDown : ExtendedCustomMonoBehavior {
 		horz = Mathf.Clamp(defaul_Input.GetHorizontal(),-1,1);
 		vert = Mathf.Clamp(default_input.GetVertical(),-1,1);
 	}
+
+	public virtual void LateUpdate()
+	{
+		// revisamos entradas en LateUpdate porque unity lo recomienda
+		if(canControl)
+			GetInput();
+	}
+
+	public bool moveDirectionally;
+
+	private Vector3 targetDirection;
+	private float curSmooth;
+	private float targetSpeed;
+	private float curSpeed;
+	private Vector3 forward;
+	private Vector3 right;
+
+	void UpdateSmoothMovementDirection()
+	{
+		if(moveDirectionally)
+		{
+			UpdateDirectionalMovement();
+		}else{
+			UpdateRotationMovement();
+		}
+	}
+
+	void UpdateDirectionalMovement()
+	{
+		targetDirection = horz * Vector3.right;
+		targetDirection += vert * Vector3.forward;
+
+		// almacenamos la velocidad y direccion de forma separada
+		// de esa manera si el personaje permanece quieto todavia tendremos
+		// una direccion valida
+		// moveDirection esta siempre normalizada, y solo la actualizamos 
+		// si hay entrada de usuario
+		if(targetDirection != Vector3.zero)
+		{
+			moveDirection = Vector3.RotateTowards(moveDirection,targetDirection,rotateSpeed*Mathf.Deg2Rad*Time.deltaTime,1000);
+			moveDirection = moveDirection.normalized;
+		}
+
+		//suavizar la velocidad base de la actual direccion objetivo
+		curSmooth = speedSmoothing * Time.deltaTime;
+
+		//escojer la velocidad objetivo
+		//* queremos soportar entrada analoga pero sin que camine mas rapido en diagonal
+		targetSpeed = Mathf.Min(targetDirection.magnitude,1.0f);
+
+		_characterState = CharacterState.Idle;
+
+	}
+
 }
