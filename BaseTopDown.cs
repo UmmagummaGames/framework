@@ -172,6 +172,56 @@ public class BaseTopDown : ExtendedCustomMonoBehavior {
 
 		_characterState = CharacterState.Idle;
 
+		// decide sobre el estado de la animacion y ajusta la velocidad de movimiento 
+		if(Time.time - runAfterSeconds > walkTimeStart)
+		{
+			targetSpeed *= runSpeed;
+			_characterState = CharacterState.Running;
+		}else{
+			targetSpeed *= walkSpeed;
+			_characterState = CharacterState.Walking;
+		}
+
+		moveSpeed = Mathf.Lerp(moveSpeed,targetSpeed,curSpeed);
+
+		// reiniciamos el tiempo de inicio de la caminada cuando se ponga mas lento 
+		if(moveSpeed < walkSpeed * 0.3f)
+			walkTimeStart = Time.time;
+
+		// calcular el movimiento actual 
+		Vector3 movement = moveDirection * moveSpeed;
+		movement *= Time.deltaTime;
+
+		//mover el controlador 
+		CollisionFlags = controller.Move(movement);
+
+		// configurar la rotacion a la direccion de movimiento 
+		myTransform.rotation = Quaternion.LookRotation(moveDirection);
+
+	}
+
+	void UpdateRotationMovement()
+	{
+		myTransform.Rotate(0,horz*rotateSpeed*Time.deltaTime,0);
+		curSpeed = moveSpeed * vert;
+		controller.SimpleMove(myTransform.forward*curSpeed);
+
+		// direccion objetivo (la maxima que queremos mover, usada para calcular la velocidad objetivo)
+		targetDirection = vert * myTransform.forward;
+
+		// suavizar la velocidad base en la actual direccion objetivo 
+		float curSmooth = speedSmoothing * Time.deltaTime;
+
+		// escoje la velocidad objetivo
+		targetSpeed = Mathf.Min(targetDirection.magnitude,1.0f);
+
+		_characterState = CharacterState.Idle;
+
+		// decide sobre el estado de la animacion y ajusta la velocidad de movimiento 
+		if(Time.time - runAfterSeconds > walkTimeStart)
+		{
+			targetSpeed *= runSpeed;
+		}
 	}
 
 }
