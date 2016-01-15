@@ -218,10 +218,68 @@ public class BaseTopDown : ExtendedCustomMonoBehavior {
 		_characterState = CharacterState.Idle;
 
 		// decide sobre el estado de la animacion y ajusta la velocidad de movimiento 
-		if(Time.time - runAfterSeconds > walkTimeStart)
-		{
+		if (Time.time - runAfterSeconds > walkTimeStart) {
 			targetSpeed *= runSpeed;
+			_characterState = CharacterState.Running;
+		
+		} 
+		else 
+		{
+			targetSpeed *= walkSpeed;
+			_characterState = CharacterState.Walking;
 		}
+
+		moveSpeed = Mathf.Lerp (moveSpeed,targetSpeed,curSmooth);
+
+		//Reiniciar el tiempo de inicio de la caminada cuando se pone lento 
+		if (moveSpeed < walkSpeed * 0.3f)
+			walkTimeStart = Time.time;
+	}
+
+	void Update ()
+	{
+		if (!canControl) {
+			// mata todas las entradas si no es controlable 
+			Input.ResetInputAxes();
+		}
+
+		UpdateSmoothMovementDirection ();
+
+		//ANIMATION sector
+		if(_animation){
+			if (controller.velocity.sqrMagnitude < 0.1f) {
+				_animation.CrossFade (idleAnimation.name);
+			} else {
+				if (_characterState == CharacterState.Running) {
+					_animation [walkAnimation.name].speed = Mathf.Clamp (controller.velocity.magnitude, 0.0f, runMaxAnimationSpeed);
+					_animation.CrossFade (walkAnimation.name);
+				} else if (_characterState == CharacterState.Walking) {
+					_animation [walkAnimation.name].speed = Mathf.Clamp (controller.velocity.magnitude, 0.0f, walkMaxAnimationSpeed);
+					_animation.CrossFade (walkAnimation.name);
+				}
+
+			}
+		}
+	}
+
+	public float GetSpeed()
+	{
+		return moveSpeed;
+	}
+
+	public Vector3 GetDirection()
+	{
+		return moveDirection;
+	}
+
+	public bool IsMoving()
+	{
+		return Mathf.Abs (vert) + Mathf.Abs (horz) > 0.5f;
+	}
+
+	public void Reset()
+	{
+		gameObject.tag = "Player";
 	}
 
 }
