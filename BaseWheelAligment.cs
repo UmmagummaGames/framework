@@ -35,5 +35,18 @@ public class BaseWheelAligment : MonoBehaviour {
 		} else {
 			myTransform.position = ColliderCenterPoint - (colliderTransform.up * CorrespondingCollider.suspensionDistance);
 		}
+
+		myTransform.rotation = colliderTransform.rotation * Quaternion.Euler (RotationValue, CorrespondingCollider.steerAngle,0);
+
+		RotationValue += CorrespondingCollider.rpm * (360 / 60) * Time.deltaTime;
+
+		WheelHit correspondingGroundHit = new WheelHit ();
+		CorrespondingCollider.GetGroundHit (out correspondingGroundHit);
+
+		if(Mathf.Abs(correspondingGroundHit.sidewaysSlip) > slipAmoutForTireSmoke){
+			if(slipPrefab){
+				SpawnController.Instance.Spawn (slipPrefab, correspondingGroundHit.point, zeroRotation);
+			}
+		}
 	}
 }
