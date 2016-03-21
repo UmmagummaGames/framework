@@ -102,6 +102,20 @@ public class Waypoints_Controller : MonoBehaviour {
 		totalTransforms = (int)transforms.Count;
 	}
 
+	public int FindNearestWaypoint(Vector3 fromPos, float maxRange)
+	{
+		// asegurarse de que hemos poblado la lista de transforms 
+		// y si no, poblarlas.
+		if (transforms == null)
+			GetTransforms ();
 
+		//la variable de distancia es solo usada para guardar la distancia actual 
+		//cuando estamos comparando, asi podemos encontar la distancia mas corta = Mathf.Infinity;
+
+		//Iteramos atravez de ellos y encontramos la mas corta 
+		for (int i = 0; i < transforms.Count; i++) {
+
+		}
+	}
 
 }
