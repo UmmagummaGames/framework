@@ -114,8 +114,32 @@ public class Waypoints_Controller : MonoBehaviour {
 
 		//Iteramos atravez de ellos y encontramos la mas corta 
 		for (int i = 0; i < transforms.Count; i++) {
+			//agarra una referencia al transform 
+			TEMPtrans = (Transform)transforms[i];
+
+			// calcula la distancia entre el transform actual y el pasado en la posicion del vector
+			diff = (TEMPtrans.position - fromPos);
+			curDistance = diff.sqrMagnitude;
+
+			//ahora comparamos las distancias asegurandonos que no estamos tan cerca como el 
+			//objeto mas cercano (cuya distancia esta guardada en la variable distance)
+			if (curDistance < distance) {
+				if (Mathf.Abs (TEMPtrans.position.y - fromPos.y) < maxRange) {
+					closest = TEMPtrans;
+					TEMPindex = i;
+					distance = curDistance;
+				}
+			}
 
 		}
+
+		if (closest) {
+			return TEMPindex;
+		} else {
+			return -1;
+		}
+
 	}
+
 
 }
