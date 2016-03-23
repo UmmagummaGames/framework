@@ -141,5 +141,54 @@ public class Waypoints_Controller : MonoBehaviour {
 
 	}
 
+	//esta funcion tiene la adicion de un check para evitar encontrar el mismo transform 
+	//como el que ya se paso. hacemos esto para asegurarnos de que estamos mirando al waypoint 
+	//mas cercano que no es el que ya pasamos 
+	public int FindNearestWaypoint(Vector3 fromPos, Transform exceptThis, float maxRange){
+		if (transforms == null)
+			GetTransforms ();
 
+		for(int i = 0;i < transforms.Count;i++){
+			TEMPtrans = (Transform)transforms[i];
+			diff = (TEMPtrans.position - fromPos);
+			curDistance = diff.sqrMagnitude;
+
+			if (curDistance < distance && TEMPtrans != exceptThis) {
+				if (Mathf.Abs (TEMPtrans.position.y - fromPos.y) < maxRange) {
+					closest = TEMPtrans;
+					TEMPindex = i;
+					distance = curDistance;
+				}
+			}
+		}
+
+		if (closest) {
+			return TEMPindex;
+		} else {
+			return -1;
+		}
+
+	}
+
+	public Transform GetWaypoint(int index){
+		if (shouldReverse) {
+			index = (transforms.Count - 1) - index;
+
+			if (index < 0) {
+				index = 0;
+			}
+		}
+
+		if (transforms == null)
+			GetTransforms ();
+
+		if (index > transforms.Count - 1)
+			return null;
+
+		return (Transform)transforms[index];
+	}
+
+	public int GetTotal(){
+		return totalTransforms;
+	}
 }
